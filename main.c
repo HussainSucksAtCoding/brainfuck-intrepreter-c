@@ -41,7 +41,7 @@ TokenType* lexer(FILE *source_file) {
 	source_chars[i] = '\0';
 	int code_length = i;
 
-	TokenType* tokens = malloc(sizeof(source_chars) * code_length);
+	TokenType* tokens = malloc(sizeof(TokenType) * code_length);
 	for(int i = 0; i < code_length; i++) {
 		if(source_chars[i] == '+') tokens[i] = INCREMENT;
 		if(source_chars[i] == '-') tokens[i] = DECREMENT;
@@ -70,55 +70,67 @@ TokenType* lexer(FILE *source_file) {
 }
 
 void execute(TokenType *tokens) {
-	char code[1000] = {0};
+	char code[3000] = {0};
 	size_t ptr = 0;
 
-	int loops = 0;
-	size_t loop_numeraters[100] = {0};
-	size_t loop_starts[100] = {0};
-	int numeraters = 0;
-	int current_loop = -1;
+	int loop_map[1000] = {0};
+	int stack[1000];
+	int sp = 0;
+	
+	for (int i = 0; tokens[i] != code_end; i++) {
+		if (tokens[i] == LOOP_BEGIN) {
+			stack[sp++] = i;
+		} else if (tokens[i] == LOOP_END) {
+			if (sp == 0) {
+				printf("Unmatched ']' at %d\n", i);
+				exit(1);
+			}
+			int start = stack[--sp];
+			loop_map[start] = i;
+			loop_map[i] = start;
+		}
+	}
 
-	int i = 0;
-	while(tokens[i] != code_end) {
-		switch(tokens[i]) {
+	if (sp != 0) {
+		printf("Unmatched '[' at %d\n", stack[sp - 1]);
+		exit(1);
+	}
+
+	for (int i = 0; tokens[i] != code_end; i++) {
+		switch (tokens[i]) {
 			case MOVE_RIGHT:
-				ptr += 1;
+				ptr++;
 				break;
 			case MOVE_LEFT:
-				if(ptr != 0) {
-					ptr -= 1;
-				}
+				ptr--;
 				break;
 			case INCREMENT:
-				code[ptr] += 1;
+				code[ptr]++;
 				break;
 			case DECREMENT:
-				code[ptr] -= 1;
-				break;
-			case LOOP_BEGIN:
-				loop_starts[current_loop] += i;
-				loop_numeraters[numeraters] = i - 1;
-				current_loop += 1;
-				numeraters += 1;
-				break;
-
-			case LOOP_END:
-				if(loops > 0 && numeraters > 0 && loop_numeraters[current_loop] >= 0) {
-						loop_numeraters[current_loop] -= 1;
-						ptr = loop_starts[current_loop] + 1;
-				}
+				code[ptr]--;
 				break;
 			case PRINT:
-				printf("%d", code[ptr]);
+				if (code[ptr] >= 32 && code[ptr] <= 126) {
+        				putchar(code[ptr]);
+				} else {
+        				printf("[%d]", code[ptr]);
+    				}
 				break;
 			case INPUT:
-				//printf("taking input isnt implemented yet");
+				break;
+			case LOOP_BEGIN:
+				if (code[ptr] == 0) {
+					i = loop_map[i];
+				}
+				break;
+			case LOOP_END:
+				if (code[ptr] != 0) {
+					i = loop_map[i];
+				}
+				break;
 		}
-
-		i++;
-	}
-}
+	}}
 
 int main() {
 	FILE *f_ptr = fopen("code.bf", "r");
