@@ -74,25 +74,24 @@ void execute(TokenType *tokens) {
 	size_t ptr = 0;
 
 	int loop_map[1000] = {0};
-	int stack[1000];
-	int sp = 0;
+	int loop_p = 0;
 	
 	for (int i = 0; tokens[i] != code_end; i++) {
 		if (tokens[i] == LOOP_BEGIN) {
-			stack[sp++] = i;
+			loop_map[loop_p++] = i;
 		} else if (tokens[i] == LOOP_END) {
-			if (sp == 0) {
+			if (loop_p == 0) {
 				printf("Unmatched ']' at %d\n", i);
 				exit(1);
 			}
-			int start = stack[--sp];
+			int start = loop_map[--loop_p];
 			loop_map[start] = i;
 			loop_map[i] = start;
 		}
 	}
 
-	if (sp != 0) {
-		printf("Unmatched '[' at %d\n", stack[sp - 1]);
+	if (loop_p != 0) {
+		printf("Unmatched '[' at %d\n", loop_map[loop_p - 1]);
 		exit(1);
 	}
 
