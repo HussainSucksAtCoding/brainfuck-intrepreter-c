@@ -3,6 +3,7 @@
 
 //magic numbers
 #define code_end 9
+#define debug_mode 1
 
 typedef enum {
 	MOVE_RIGHT,
@@ -39,6 +40,11 @@ TokenType* lexer(FILE *source_file) {
 	}
 	
 	source_chars[i] = '\0';
+
+	if(debug_mode) {
+		printf("source code: %s", source_chars);
+	}
+
 	int code_length = i;
 
 	TokenType* tokens = malloc(sizeof(TokenType) * code_length);
@@ -61,7 +67,9 @@ TokenType* lexer(FILE *source_file) {
 	printf("\n");
 	
 	for(int i = 0; i < code_length; i++) {
-		//printf("%d", tokens[i]);
+		if(debug_mode) {
+			printf("enum tokens: %d", tokens[i]);
+		}
 	}
 	
 	tokens[i] = code_end;
@@ -82,7 +90,7 @@ void execute(TokenType *tokens) {
 		} else if (tokens[i] == LOOP_END) {
 			if (loop_p == 0) {
 				printf("Unmatched ']' at %d\n", i);
-				exit(1);
+				exit(-1);
 			}
 			int start = loop_map[--loop_p];
 			loop_map[start] = i;
@@ -92,7 +100,7 @@ void execute(TokenType *tokens) {
 
 	if (loop_p != 0) {
 		printf("Unmatched '[' at %d\n", loop_map[loop_p - 1]);
-		exit(1);
+		exit(-1);
 	}
 
 	for (int i = 0; tokens[i] != code_end; i++) {
