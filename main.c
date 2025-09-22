@@ -60,21 +60,19 @@ TokenType* lexer(FILE *source_file) {
 
 		if(source_chars[i] == '[') tokens[i] = LOOP_BEGIN;
 		if(source_chars[i] == ']') tokens[i] = LOOP_END;
-
-		printf("%c", source_chars[i]);
 	}
 
-	printf("\n");
-	
-	for(int i = 0; i < code_length; i++) {
-		if(debug_mode) {
-			printf("enum tokens: %d", tokens[i]);
+	if(debug_mode) {
+		printf("\nenum tokens: ");
+		for(int i = 0; i < code_length; i++) {
+			printf("%d", tokens[i]);
 		}
+		printf("\n");
 	}
 	
 	tokens[i] = code_end;
-	return tokens;
 
+	return tokens;
 }
 
 void execute(TokenType *tokens) {
@@ -151,6 +149,7 @@ int main() {
 	
 	execute(tokens);
 
+	free(tokens);
 	fclose(f_ptr);
 	return 0;
 }
