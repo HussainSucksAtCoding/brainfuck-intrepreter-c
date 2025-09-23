@@ -2,10 +2,10 @@
 #include <stdlib.h>
 
 //magic numbers
-#define code_end 9
 #define debug_mode 1
 
 typedef enum {
+	NO_INSTRUCTIONS,
 	MOVE_RIGHT,
 	MOVE_LEFT,
 	INCREMENT,
@@ -14,35 +14,33 @@ typedef enum {
 	LOOP_BEGIN,
 	LOOP_END,
 	INPUT,
+	CODE_END,
 } TokenType;
 
-long int fsize(FILE *f) {
-	fseek(f, 0l, SEEK_END);
-	long int size = ftell(f);
-	rewind(f);
-
-	return size;
+int code_length(FILE *source_file) {
+	int code_len = 0;
+	
+	char c;
+	while( ( c = fgetc(source_file) ) != EOF) {
+		code_len++;
+	}
+	rewind(source_file);
+	return code_len;
 }
 
 TokenType* lexer(FILE *source_file) {
-	char source_symbols = 0;
-	
-	int code_length = 0;
-	while( ( source_symbols = fgetc(source_file) ) != EOF) {
-		code_length++;
-	}
-	rewind(source_file);
+	int code_len = code_length(source_file);
 
-	char char_array[code_length];
-
-	for(int i = 0; i < code_length; i++) {
-		char_array[i] = (source_symbols = fgetc(source_file));	
+	char char_array[code_len];
+	char c;
+	for(int i = 0; i < code_len; i++) {
+		char_array[i] = (c = fgetc(source_file));	
 	}
 
-	char_array[code_length] = '\0';
+	char_array[code_len] = '\0';
 
-	TokenType* tokens = malloc(sizeof(TokenType) * code_length);
-	for(int i = 0; i < code_length; i++) {
+	TokenType* tokens = malloc(sizeof(TokenType) * (code_len + 1));
+	for(int i = 0; i < code_len; i++) {
 		if(char_array[i] == '+') tokens[i] = INCREMENT;
 		if(char_array[i] == '-') tokens[i] = DECREMENT;
 
@@ -54,20 +52,23 @@ TokenType* lexer(FILE *source_file) {
 
 		if(char_array[i] == '[') tokens[i] = LOOP_BEGIN;
 		if(char_array[i] == ']') tokens[i] = LOOP_END;
+
+		printf("%d", i);
 	}
 
 	if(debug_mode) {
 		printf("source code: %s", char_array);
-		printf("code tape length: %d\n", code_length);
-
-		printf("\nenum tokens: ");
-		for(int i = 0; i < code_length; i++) {
+	
+		printf("enum tokens: ");
+		for(int i = 0; i < code_len; i++) {
 			printf("%d", tokens[i]);
 		}
 		printf("\n");
+		
+		printf("code tape length: %d\n", code_len);
 	}
 	
-	tokens[code_length] = code_end;
+	tokens[code_len] = CODE_END;
 
 	return tokens;
 }
@@ -79,7 +80,7 @@ void execute(TokenType *tokens) {
 	int loop_map[1000] = {0};
 	int loop_p = 0;
 	
-	for (int i = 0; tokens[i] != code_end; i++) {
+	for (int i = 0; tokens[i] != CODE_END; i++) {
 		if (tokens[i] == LOOP_BEGIN) {
 			loop_map[loop_p++] = i;
 		} else if (tokens[i] == LOOP_END) {
@@ -98,7 +99,7 @@ void execute(TokenType *tokens) {
 		exit(-1);
 	}
 
-	for (int i = 0; tokens[i] != code_end; i++) {
+	for (int i = 0; tokens[i] != CODE_END; i++) {
 		switch (tokens[i]) {
 			case MOVE_RIGHT:
 				ptr++;
@@ -130,6 +131,8 @@ void execute(TokenType *tokens) {
 				if (code[ptr] != 0) {
 					i = loop_map[i];
 				}
+				break;
+			default:
 				break;
 		}
 	}}
