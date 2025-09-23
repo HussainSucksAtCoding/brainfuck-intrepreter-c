@@ -25,44 +25,41 @@ long int fsize(FILE *f) {
 }
 
 TokenType* lexer(FILE *source_file) {
-	size_t i = 0;
-	long int file_length = fsize(source_file);
-	char source_chars[file_length];
+	char source_symbols = 0;
 	
-	char c;
-
-	while( (c = fgetc(source_file)) != EOF) {
-		if(c != '\n') {
-			source_chars[i] = (char)c;
-			i++;
-		}
-
+	int code_length = 0;
+	while( ( source_symbols = fgetc(source_file) ) != EOF) {
+		code_length++;
 	}
-	
-	source_chars[i] = '\0';
+	rewind(source_file);
 
-	if(debug_mode) {
-		printf("source code: %s", source_chars);
+	char char_array[code_length];
+
+	for(int i = 0; i < code_length; i++) {
+		char_array[i] = (source_symbols = fgetc(source_file));	
 	}
 
-	int code_length = i;
+	char_array[code_length] = '\0';
 
 	TokenType* tokens = malloc(sizeof(TokenType) * code_length);
 	for(int i = 0; i < code_length; i++) {
-		if(source_chars[i] == '+') tokens[i] = INCREMENT;
-		if(source_chars[i] == '-') tokens[i] = DECREMENT;
+		if(char_array[i] == '+') tokens[i] = INCREMENT;
+		if(char_array[i] == '-') tokens[i] = DECREMENT;
 
-		if(source_chars[i] == '>') tokens[i] = MOVE_RIGHT;
-		if(source_chars[i] == '<') tokens[i] = MOVE_LEFT;
+		if(char_array[i] == '>') tokens[i] = MOVE_RIGHT;
+		if(char_array[i] == '<') tokens[i] = MOVE_LEFT;
 
-		if(source_chars[i] == '.') tokens[i] = PRINT;
-		if(source_chars[i] == ',') tokens[i] = INPUT;
+		if(char_array[i] == '.') tokens[i] = PRINT;
+		if(char_array[i] == ',') tokens[i] = INPUT;
 
-		if(source_chars[i] == '[') tokens[i] = LOOP_BEGIN;
-		if(source_chars[i] == ']') tokens[i] = LOOP_END;
+		if(char_array[i] == '[') tokens[i] = LOOP_BEGIN;
+		if(char_array[i] == ']') tokens[i] = LOOP_END;
 	}
 
 	if(debug_mode) {
+		printf("source code: %s", char_array);
+		printf("code tape length: %d\n", code_length);
+
 		printf("\nenum tokens: ");
 		for(int i = 0; i < code_length; i++) {
 			printf("%d", tokens[i]);
@@ -70,7 +67,7 @@ TokenType* lexer(FILE *source_file) {
 		printf("\n");
 	}
 	
-	tokens[i] = code_end;
+	tokens[code_length] = code_end;
 
 	return tokens;
 }
