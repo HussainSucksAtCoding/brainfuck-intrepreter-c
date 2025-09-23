@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 //magic numbers
-#define debug_mode 1
+#define debug_mode 0
 
 typedef enum {
 	NO_INSTRUCTIONS,
@@ -31,12 +31,11 @@ int code_length(FILE *source_file) {
 TokenType* lexer(FILE *source_file) {
 	int code_len = code_length(source_file);
 
-	char char_array[code_len];
 	char c;
+	char char_array[code_len];
 	for(int i = 0; i < code_len; i++) {
 		char_array[i] = (c = fgetc(source_file));	
 	}
-
 	char_array[code_len] = '\0';
 
 	TokenType* tokens = malloc(sizeof(TokenType) * (code_len + 1));
@@ -52,8 +51,6 @@ TokenType* lexer(FILE *source_file) {
 
 		if(char_array[i] == '[') tokens[i] = LOOP_BEGIN;
 		if(char_array[i] == ']') tokens[i] = LOOP_END;
-
-		printf("%d", i);
 	}
 
 	if(debug_mode) {
@@ -121,6 +118,7 @@ void execute(TokenType *tokens) {
     				}
 				break;
 			case INPUT:
+				printf("too lazy to implement inputs for now");
 				break;
 			case LOOP_BEGIN:
 				if (code[ptr] == 0) {
@@ -135,10 +133,11 @@ void execute(TokenType *tokens) {
 			default:
 				break;
 		}
-	}}
+	}
+}
 
-int main() {
-	FILE *f_ptr = fopen("code.bf", "r");
+int main(int argc, char *argv[]) {
+	FILE *f_ptr = fopen(argv[1], "r");
 
 	if(f_ptr == NULL) {
 		printf("file not found");
