@@ -1,3 +1,4 @@
-
+# builds and run the intrepreter
 make -s
+make clean -s
 ./intrepreter $1

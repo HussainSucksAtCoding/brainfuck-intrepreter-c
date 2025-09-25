@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 //magic numbers
-#define debug_mode 0
+#define debug_mode 1
 
 typedef enum {
 	NO_INSTRUCTIONS,
@@ -146,6 +146,7 @@ int main(int argc, char *argv[]) {
 
 	TokenType *tokens = lexer(f_ptr);
 	
+	if(debug_mode) printf("output: \n");
 	execute(tokens);
 
 	free(tokens);
