@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 //magic numbers
-#define debug_mode 1
+#define debug_mode 0
 
 typedef enum {
 	NO_INSTRUCTIONS,
@@ -77,7 +77,16 @@ void execute(TokenType *tokens) {
 	int loop_map[1000] = {0};
 	int loop_p = 0;
 	
-	for (int i = 0; tokens[i] != CODE_END; i++) {
+	// The toughest motherfucker in this project: implementing loops. So I'm gonna give it a special treatment and explain it.
+	// First, maps location of the opening and closing loop brackets
+	// Second, switches their location so each loop bracket instructs the program counter to jump to either the opening or closing bracket.
+	// Example: 
+	// Begin loop is at cell 1
+	// End loop is at cell 7
+	// 0, 1(begin loop), 0, 0, ..., 7[end loop]
+	// Switched: 0, 7, 0, 0, ..., 1
+	// Now, if the conditions are correct, it reads the value in the map and jumps to the location represented by that value.
+	 for (int i = 0; tokens[i] != CODE_END; i++) {
 		if (tokens[i] == LOOP_BEGIN) {
 			loop_map[loop_p++] = i;
 		} else if (tokens[i] == LOOP_END) {
@@ -85,6 +94,8 @@ void execute(TokenType *tokens) {
 				printf("Unmatched ']' at %d\n", i);
 				exit(-1);
 			}
+			
+
 			int start = loop_map[--loop_p];
 			loop_map[start] = i;
 			loop_map[i] = start;
