@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 //magic numbers
-#define debug_mode 1
+#define debug_mode 0
 
 typedef enum {
 	NO_INSTRUCTIONS,
