@@ -131,7 +131,7 @@ void execute(TokenType *tokens) {
     				}
 				break;
 			case INPUT:
-				scanf("%c", &input_value);
+				input_value = getchar();
 				code[ptr] = input_value;
 				break;
 			case LOOP_BEGIN:
