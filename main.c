@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 //magic numbers
-#define debug_mode 0
+#define debug_mode 1
 
 typedef enum {
 	NO_INSTRUCTIONS,
@@ -73,6 +73,8 @@ TokenType* lexer(FILE *source_file) {
 void execute(TokenType *tokens) {
 	char code[3000] = {0};
 	size_t ptr = 0;
+	
+	char input_value;
 
 	int loop_map[1000] = {0};
 	int loop_p = 0;
@@ -129,7 +131,8 @@ void execute(TokenType *tokens) {
     				}
 				break;
 			case INPUT:
-				printf("too lazy to implement inputs for now");
+				scanf("%c", &input_value);
+				code[ptr] = input_value;
 				break;
 			case LOOP_BEGIN:
 				if (code[ptr] == 0) {
