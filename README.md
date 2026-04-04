@@ -1,9 +1,9 @@
-# Brainfuck intrepreter c
-A brainfuck intrepreter written in C
+# Brainfuck interpreter c
+A brainfuck interpreter written in C
 
 # Build
 ``` make ```
 
 # Usage
-``` ./intrepreter [filename] ```
+``` ./interpreter [filename] ```
 

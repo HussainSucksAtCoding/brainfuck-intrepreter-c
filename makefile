@@ -1,7 +1,7 @@
 objects=main.o
 
-intrepreter: $(objects)
-	gcc $(objects) -o intrepreter
+interpreter: $(objects)
+	gcc $(objects) -o interpreter
 
 main.o: main.c
 	gcc -c main.c
